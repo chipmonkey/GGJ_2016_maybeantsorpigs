@@ -19,6 +19,7 @@
 </div>
 <script type="text/javascript" src="js/phaser.min.js"></script>
 <script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/easystar-0.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
@@ -157,11 +158,18 @@
 
     function toggleSound() {
         if (mute.frame == 0) {
-            game.sound.mute = true;
             mute.frame = 1;
+            music.volume = 0;
+            gulp.volume = 0;
+            flap.volume = 0;
+            teleport.volume = 0;
+
         } else {
-            game.sound.mute = false;
             mute.frame = 0;
+            music.volume = 0.75;
+            gulp.volume = 1;
+            flap.volume = 0.5;
+            teleport.volume = 1;
         }
     }
 
@@ -178,8 +186,8 @@
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
         // Added a 'level' parameter...
         if (mylevel == 1) {music=game.add.sound('music_level1', musicvolume)}
-        else if (mylevel == 2) {music=game.add.sound('music_level2', musicvolume)}
-        else if (mylevel == 3) {music=game.add.sound('music_level3', musicvolume)}
+        else if (mylevel == 2) {music=game.add.sound('music_level1', musicvolume)}
+        else if (mylevel == 3) {music=game.add.sound('music_level1', musicvolume)}
         else { music = game.add.sound('antmusic', musicvolume) }
         music.play();
         music.onStop.add(rePlay, this);
