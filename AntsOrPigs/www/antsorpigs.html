@@ -10,7 +10,8 @@
 
 <div class="container">
     <h1 class="col-lg-offset-4 col-lg-6">Ants or Pigs</h1>
-    <p class="col-lg-offset-4">Professionally crafted for Global Game Jam 2016 by LilacLlama, ChipMonkey, GaryTaco, and Zomblack</p>
+    <p class="col-lg-offset-4">Professionally crafted for Global Game Jam 2016 by LilacLlama, ChipMonkey, GaryTaco, and
+        Zomblack</p>
     <hr/>
 
     <div class="col-lg-offset-1 col-lg-10" id="game"/>
@@ -23,24 +24,24 @@
 </html>
 
 <script type="text/javascript">
-    
-    var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {
-        preload: preload,
-        create: create,
-        update: update,
-        render: render
-    });
 
-    var WORLD_SIZE_WIDTH = 900;
-    var WORLD_SIZE_HEIGHT = 500;
+    var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {});
+
     var musicvolume = 0.75;
-    var musiclevel = 1;
-    
+
     const C_EARTH = 1;
     const C_AIR = 2;
     const C_WATER = 3;
     const C_FIRE = 4;
     
+    var earthcounter = 5;
+    var aircounter = 5;
+    var watercounter = 5;
+    var firecounter = 5;
+    
+    var mybrush = C_EARTH;
+    var brushdown = false;
+    var musiclevel = 1;
 
 
     var worldSprites = [
@@ -52,104 +53,366 @@
     var starsSwallowed = 0;
     var getwell;
     var splash;
-    var tween;
-    
-    function preload() {
+    //var tween;
+    var PhaserGame = function () {
+
+        this.bmd = null;
+        this.points = {
+            'x': [0, 100, 200, 300, 400, 500, 600, 700, 800, 900],
+            'y': [240, 240, 240, 240, 240, 240, 240, 240, 240, 240]
+        };
+
+        this.ant = null;
+        this.bmd = null;
+        this.pi = 0;
+        this.move1 = 0;
+        this.move2 = 0;
+        this.move3 = 0;
+        this.move4 = 0;
+        this.move5 = 0;
+        this.move6 = 0;
+        this.move7 = 0;
+        this.move8 = 0;
+        this.move9 = 0;
+        this.path = [];
+        this.newAnt1 = null;
+        this.newAnt2 = null;
+        this.newAnt3 = null;
+        this.newAnt4 = null;
+        this.newAnt5 = null;
+        this.newAnt6 = null;
+        this.newAnt7 = null;
+        this.newAnt8 = null;
+        this.newAnt9 = null;
+    };
+
+    PhaserGame.prototype = {
+
+        init: function () {
+            this.game.renderer.renderSession.roundPixels = true;
+
+        },
+
+        preload: function () {
 
 
-        // Sprites
-        game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
-        game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
-        game.load.spritesheet('earth_button', 'assets/earth_buttons.png', 81, 81);
-        game.load.spritesheet('water_button', 'assets/water_buttons.png', 81, 81);
-        game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
-        game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
+
+            // Sprites
+            game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
+            game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
+            game.load.spritesheet('earth_button', 'assets/earth_buttons.png', 81, 81);
+            game.load.spritesheet('water_button', 'assets/water_buttons.png', 81, 81);
+            game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
+            game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
+            game.load.spritesheet('spider', 'assets/spider_32x32.png', 32, 32);
+			game.load.spritesheet('splat', 'assets/splat40x25.png', 40, 25);
+
+            // Images
+            game.load.image('dirt', 'assets/rpgTile024.png');
+            game.load.image('splash', 'assets/SplashScreen.png');
+
+            // Audio
+            game.load.audio('antmusic', 'assets/peg.mp3');
+            game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
+            game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
+            game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
+
+        },
+
+        create: function () {
+
+            //game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
+            //game.physics.startSystem(Phaser.Physics.ARCADE);
 
 
-//        for (i = 0; i < planetSprites.length; i++) {
-//            game.load.spritesheet(planetSprites[i].sheet, planetSprites[i].assets, planetSprites[i].size, planetSprites[i].size);
-//        }
-//
-//        // Images
-        game.load.image('dirt', 'assets/rpgTile024.png');
-//        game.load.image('stars', 'assets/starsglow1.gif');
-        game.load.image('splash', 'assets/SplashScreen.png');
-        game.load.image('music', 'assets/musicnote.png');
+            bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
 
-        // Audio
-//        game.load.audio('gulp', 'assets/gulp.m4a');
-//        game.load.audio('birdflapping', 'assets/Flap.m4a');
-//        game.load.audio('teleport', 'assets/teleport.mp3');
-        game.load.audio('antmusic', 'assets/peg.mp3');
-        game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
-        game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
-        game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
+            soundSetup(1);
 
-    }
+            //  The score
+            scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
+            scoreText.fixedToCamera = true;
 
-    function create() {
+            // Volume Button
+            mute = game.add.button(866, 16, 'volume', toggleSound, this);
+            mute.anchor.setTo(0.5, 0.5);
+            mute.fixedToCamera = true;
 
-        game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-
-        bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
-        
-        soundSetup(musiclevel);
-
-        //  The score
-        scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
-        scoreText.fixedToCamera = true;
-
-        // Volume Button
-        mute = game.add.button(866, 16, 'volume', toggleSound, this);
-        mute.anchor.setTo(0.5, 0.5);
-        mute.fixedToCamera = true;
-        
-        // Music Button
-        musictoggle = game.add.button(866, 70, 'music', toggleMusic, this);
-        musictoggle.anchor.setTo(0.5, 0.5);
-        musictoggle.fixedToCamera = true;
-
-        // Our controls.
-        cursors = game.input.keyboard.createCursorKeys();
+            // Our controls.
+            cursors = game.input.keyboard.createCursorKeys();
 //        cursors.left.onDown.add(null, this);
-        earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
-        waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
-        airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
-        firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
-        // earthbutton.anchor.setTo(0.5, 0.5);
-        // earthbutton.fixedToCamera = true;
-
-
-        // Splash screen
-        splash = game.add.sprite(0, 0, 'splash');
-        splash.fixedToCamera = true;
-        game.input.keyboard.onDownCallback = removeLogo;
-        game.paused = true;
-
-        ant = game.add.sprite(450, 250, 'ant');
-        
-        tween = game.add.tween(ant).to({ x: [game.width - 32, game.width - 32, 0, 0], y: [0, game.height - 32, game.height - 32, 0]}, 5000, "Sine.easeInOut", true, 0, false);
-        tween.interpolation(Phaser.Math.catmullRomInterpolation);
-    }
-    function update() {
-
-        //  Checks to see if the chicken overlaps with any of the stars, if he does call the collectStar function
-        //        game.physics.arcade.overlap(chicken, stars, collectStar, null, this);
-        //    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
-        //        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
-        
-        
+		    earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
+            waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
+            airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
+            firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
+        	earthbutton.onInputOver.add(over, this);
+        	waterbutton.onInputOver.add(over, this);
+        	airbutton.onInputOver.add(over, this);
+        	firebutton.onInputOver.add(over, this);
+        	earthbutton.onInputOut.add(outbutton, this);
+        	waterbutton.onInputOut.add(outbutton, this);
+        	airbutton.onInputOut.add(outbutton, this);
+        	firebutton.onInputOut.add(outbutton, this);
 
 
 
-    }
+            this.bmd = this.add.bitmapData(this.game.width, this.game.height);
+            this.bmd.addToWorld();
+            this.ant = game.add.sprite(0, 0, 'ant');
+            this.ant.anchor.set(0.5);
+
+            var py = this.points.y;
+
+            for (var i = 0; i < py.length; i++) {
+                py[i] = this.rnd.between(32, 432);
+            }
+
+            this.plot();
+
+            game.time.events.add(Phaser.Timer.SECOND * 3, createAnt1, this);
+            game.time.events.add(Phaser.Timer.SECOND * 6, createAnt2, this);
+            game.time.events.add(Phaser.Timer.SECOND * 9, createAnt3, this);
+            game.time.events.add(Phaser.Timer.SECOND * 12, createAnt4, this);
+            game.time.events.add(Phaser.Timer.SECOND * 15, createAnt5, this);
+            game.time.events.add(Phaser.Timer.SECOND * 18, createAnt6, this);
+            game.time.events.add(Phaser.Timer.SECOND * 21, createAnt7, this);
+            game.time.events.add(Phaser.Timer.SECOND * 24, createAnt8, this);
+            game.time.events.add(Phaser.Timer.SECOND * 27, createAnt9, this);
+
+            // Spider
+            var obstaclePt =  this.rnd.between(0, 9)
+            var rScale = game.rnd.realInRange(2, 4);
+            var spider = game.add.sprite(this.points.x[obstaclePt] - 16 * rScale , this.points.y[obstaclePt] - 16 * rScale, 'spider');
+            spider.scale.setTo(rScale, rScale);
+            var chomp = spider.animations.add('chomp');
+            spider.animations.play('chomp', 7, true);
+//            spider.anchor.setTo(0.5, 0.5);
+//            spider.angle += 90;
+
+
+            // Splash screen
+            splash = game.add.sprite(0, 0, 'splash');
+            splash.fixedToCamera = true;
+            game.input.keyboard.onDownCallback = removeLogo;
+            game.paused = true;
+
+        },
+
+
+        plot: function () {
+
+
+            this.bmd.clear();
+            this.path = [];
+            var ix = 0;
+
+            var x = 1 / 900;
+
+            for (var i = 0; i <= 1; i += x) {
+                //var px = this.math.linearInterpolation(this.points.x, i);
+                //var py = this.math.linearInterpolation(this.points.y, i);
+
+
+                var px = this.math.catmullRomInterpolation(this.points.x, i);
+                var py = this.math.catmullRomInterpolation(this.points.y, i);
+
+                this.bmd.rect(px, py, 1, 1, 'rgba(255, 255, 255, 1)');
+
+                var node = {x: px, y: py, angle: 0};
+
+                if (ix > 0) {
+                    node.angle = this.math.angleBetweenPoints(this.path[ix - 1], node);
+                }
+
+                this.path.push(node);
+
+                ix++;
+
+            }
+
+
+        },
+
+        update: function () {
+
+            if (this.pi < this.path.length - 1) {
+                this.ant.x = this.path[this.pi].x;
+                this.ant.y = this.path[this.pi].y;
+                this.pi++;
+                this.ant.rotation = this.path[this.pi].angle;
+            }
+            else {
+                this.ant.destroy();
+            }
+
+            if (this.newAnt1 !== null) {
+                if (this.move1 < this.path.length - 1) {
+                    this.newAnt1.x = this.path[this.move1].x;
+                    this.newAnt1.y = this.path[this.move1].y;
+                    this.move1++;
+                    this.newAnt1.rotation = this.path[this.move1].angle;
+                }
+                else {
+                    this.newAnt1.destroy();
+                }
+            }
+            if (this.newAnt2 !== null) {
+                if (this.move2 < this.path.length - 1) {
+                    this.newAnt2.x = this.path[this.move2].x;
+                    this.newAnt2.y = this.path[this.move2].y;
+                    this.move2++;
+                    this.newAnt2.rotation = this.path[this.move2].angle;
+                }
+                else {
+                    this.newAnt2.destroy();
+                }
+            }
+            if (this.newAnt3 !== null) {
+                if (this.move3 < this.path.length - 1) {
+                    this.newAnt3.x = this.path[this.move3].x;
+                    this.newAnt3.y = this.path[this.move3].y;
+                    this.move3++;
+                    this.newAnt3.rotation = this.path[this.move3].angle;
+                }
+                else {
+                    this.newAnt3.destroy();
+                }
+            }
+            if (this.newAnt4 !== null) {
+                if (this.move4 < this.path.length - 1) {
+                    this.newAnt4.x = this.path[this.move4].x;
+                    this.newAnt4.y = this.path[this.move4].y;
+                    this.move4++;
+                    this.newAnt4.rotation = this.path[this.move4].angle;
+                }
+                else {
+                    this.newAnt4.destroy();
+                }
+            }
+            if (this.newAnt5 !== null) {
+                if (this.move5 < this.path.length - 1) {
+                    this.newAnt5.x = this.path[this.move5].x;
+                    this.newAnt5.y = this.path[this.move5].y;
+                    this.move5++;
+                    this.newAnt5.rotation = this.path[this.move5].angle;
+                }
+                else {
+                    this.newAnt5.destroy();
+                }
+            }
+            if (this.newAnt6 !== null) {
+                if (this.move6 < this.path.length - 1) {
+                    this.newAnt6.x = this.path[this.move6].x;
+                    this.newAnt6.y = this.path[this.move6].y;
+                    this.move6++;
+                    this.newAnt6.rotation = this.path[this.move6].angle;
+                }
+                else {
+                    this.newAnt6.destroy();
+                }
+            }
+            if (this.newAnt7 !== null) {
+                if (this.move7 < this.path.length - 1) {
+                    this.newAnt7.x = this.path[this.move7].x;
+                    this.newAnt7.y = this.path[this.move7].y;
+                    this.move7++;
+                    this.newAnt7.rotation = this.path[this.move7].angle;
+                }
+                else {
+                    this.newAnt7.destroy();
+                }
+            }
+            if (this.newAnt8 !== null) {
+                if (this.move8 < this.path.length - 1) {
+                    this.newAnt8.x = this.path[this.move8].x;
+                    this.newAnt8.y = this.path[this.move8].y;
+                    this.move8++;
+                    this.newAnt8.rotation = this.path[this.move8].angle;
+                }
+                else {
+                    this.newAnt8.destroy();
+                }
+            }
+            if (this.newAnt9 !== null) {
+                if (this.move9 < this.path.length - 1) {
+                    this.newAnt9.x = this.path[this.move9].x;
+                    this.newAnt9.y = this.path[this.move9].y;
+                    this.move9++;
+                    this.newAnt9.rotation = this.path[this.move9].angle;
+                }
+                else {
+                    this.newAnt9.destroy();
+                }
+            }
+            if (game.input.activePointer.leftButton.isDown && brushdown) {
+            newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+            if (mybrush == C_EARTH) { newsplat.tint = 0x9f4715 }
+            if (mybrush == C_WATER) { newsplat.tint = 0x0000FF }
+            if (mybrush == C_AIR) { newsplat.tint = 0xFFFFFF }
+            if (mybrush == C_FIRE) { newsplat.tint = 0xFF0000 }
+        	}
+        }
+
+    };
 
 
     function rePlay(music) {
-        music.play()
+        toggleMusic();
     }
 
+    function over() {
+        brushdown = false;
+    }
+
+    function outbutton() {
+        brushdown = true;
+	}
+
+    function createAnt1() {
+        this.newAnt1 = game.add.sprite(0, 0, 'ant');
+        this.newAnt1.anchor.set(0.5);
+
+    }
+    function createAnt2() {
+        this.newAnt2 = game.add.sprite(0, 0, 'ant');
+        this.newAnt2.anchor.set(0.5);
+
+    }
+    function createAnt3() {
+        this.newAnt3 = game.add.sprite(0, 0, 'ant');
+        this.newAnt3.anchor.set(0.5);
+
+    }
+    function createAnt4() {
+        this.newAnt4 = game.add.sprite(0, 0, 'ant');
+        this.newAnt4.anchor.set(0.5);
+
+    }
+    function createAnt5() {
+        this.newAnt5 = game.add.sprite(0, 0, 'ant');
+        this.newAnt5.anchor.set(0.5);
+
+    }
+    function createAnt6() {
+        this.newAnt6 = game.add.sprite(0, 0, 'ant');
+        this.newAnt6.anchor.set(0.5);
+
+    }
+    function createAnt7() {
+        this.newAnt7 = game.add.sprite(0, 0, 'ant');
+        this.newAnt7.anchor.set(0.5);
+
+    }
+    function createAnt8() {
+        this.newAnt8 = game.add.sprite(0, 0, 'ant');
+        this.newAnt8.anchor.set(0.5);
+
+    }
+    function createAnt9() {
+        this.newAnt9 = game.add.sprite(0, 0, 'ant');
+        this.newAnt9.anchor.set(0.5);
+
+    }
 
     function randomNum(x) {
         return Math.floor((Math.random() * x));
@@ -167,14 +430,24 @@
             mute.frame = 0;
         }
     }
-    
     function toggleMusic() {
-        music.destroy();
         musiclevel = (musiclevel + 1)
         if (musiclevel == 4) {musiclevel = 1};
-        soundSetup(musiclevel)
-    }
+        soundSetup(musiclevel);
+	}
 
+    function earthClick() {
+        mybrush = C_FIRE
+    }
+    function waterClick() {
+        mybrush = C_WATER
+    }
+    function airClick() {
+        mybrush = C_AIR
+    }
+    function fireClick() {
+        mybrush = C_FIRE
+    }
 
     function removeLogo() {
 
@@ -183,25 +456,29 @@
         game.paused = false;
 
     }
-    
-    function earthClick() {  mybrush = C_FIRE  }
-    function waterClick() {  mybrush = C_WATER  }
-    function airClick()   {  mybrush = C_AIR  }
-    function fireClick()  {  mybrush = C_FIRE  }
 
     function soundSetup(mylevel) {
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
         // Added a 'level' parameter...
-        if (mylevel == 1) {music=game.add.audio('music_level1', musicvolume)}
-        else if (mylevel == 2) {music=game.add.audio('music_level2', musicvolume)}
-        else if (mylevel == 3) {music=game.add.audio('music_level3', musicvolume)}
-        else { music = game.add.audio('antmusic', musicvolume) }
+        if (mylevel == 1) {
+            music = game.add.sound('music_level1', musicvolume)
+        }
+        else if (mylevel == 2) {
+            music = game.add.sound('music_level2', musicvolume)
+        }
+        else if (mylevel == 3) {
+            music = game.add.sound('music_level3', musicvolume)
+        }
+        else {
+            music = game.add.sound('antmusic', musicvolume)
+        }
         music.play();
         music.onStop.add(rePlay, this);
 //        gulp = game.add.sound('gulp');
 //        flap = game.add.sound('birdflapping', 0.5);
 //        teleport = game.add.sound('teleport');
     }
+    game.state.add('Game', PhaserGame, true);
 
 
 </script>
