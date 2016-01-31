@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ants Or Pigs - Global Game Jam 2016</title>
+    <link href="css/bootstrap-cyborg.css" rel="stylesheet">
+    <link href="assets/icon.png" rel="shortcut icon">
+</head>
+<body>
+
+<div class="container">
+    <h1 class="col-lg-offset-4 col-lg-6">Ants or Pigs</h1>
+    <p class="col-lg-offset-4">Professionally crafted for Global Game Jam 2016 by LilacLlama, ChipMonkey, GaryTaco, and
+        Zomblack</p>
+    <hr/>
+
+    <div class="col-lg-offset-1 col-lg-10" id="game"/>
+
+
+</div>
+<script type="text/javascript" src="js/phaser.min.js"></script>
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</body>
+</html>
+
+<script type="text/javascript">
+
+
+    var WORLD_SIZE_WIDTH = 900;
+    var WORLD_SIZE_HEIGHT = 500;
+    var musicvolume = 0.75;
+    var game = new Phaser.Game(WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT, Phaser.AUTO, 'game', {});
+
+    const C_EARTH = 1;
+    const C_AIR = 2;
+    const C_WATER = 3;
+    const C_FIRE = 4;
+
+    var splash;
+    //var tween;
+    var PhaserGame = function () {
+
+        this.bmd = null;
+        this.points = {
+            'x': [32, 128, 256, 384, 512, 608],
+            'y': [240, 240, 240, 240, 240, 240]
+        };
+
+        this.ant = null;
+        this.bmd = null;
+        this.pi = 0;
+        this.path = [];
+    };
+
+    PhaserGame.prototype = {
+
+        init: function () {
+            this.game.renderer.renderSession.roundPixels = true;
+
+        },
+
+        preload: function () {
+
+
+
+            // Sprites
+            game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
+            game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
+            game.load.spritesheet('earth_button', 'assets/earth_buttons.png', 81, 81);
+            game.load.spritesheet('water_button', 'assets/water_buttons.png', 81, 81);
+            game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
+            game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
+            game.load.spritesheet('spider', 'assets/spider_32x32.png', 32, 32);
+
+            // Images
+            game.load.image('dirt', 'assets/rpgTile024.png');
+            game.load.image('splash', 'assets/SplashScreen.png');
+
+            // Audio
+            game.load.audio('antmusic', 'assets/peg.mp3');
+            game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
+            game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
+            game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
+
+        },
+
+        create: function () {
+
+            game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
+            bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
+
+            soundSetup(1);
+
+            //  The score
+            scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
+            scoreText.fixedToCamera = true;
+
+            // Volume Button
+            mute = game.add.button(866, 16, 'volume', toggleSound, this);
+            mute.anchor.setTo(0.5, 0.5);
+            mute.fixedToCamera = true;
+
+            // Our controls.
+            cursors = game.input.keyboard.createCursorKeys();
+//        cursors.left.onDown.add(null, this);
+            earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
+            waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
+            airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
+            firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
+            // earthbutton.anchor.setTo(0.5, 0.5);
+
+            // Spider
+            var spider = game.add.sprite(300, 200, 'spider');
+            var chomp = spider.animations.add('chomp');
+            spider.animations.play('chomp', 7, true);
+
+
+            // Splash screen
+            splash = game.add.sprite(0, 0, 'splash');
+            splash.fixedToCamera = true;
+            game.input.keyboard.onDownCallback = removeLogo;
+            game.paused = true;
+
+            this.bmd = this.add.bitmapData(this.game.width, this.game.height);
+            this.bmd.addToWorld();
+            this.ant = game.add.sprite(0, 0, 'ant');
+            this.ant.anchor.set(0.5);
+
+            var py = this.points.y;
+
+
+            this.plot();
+
+            game.time.events.repeat(Phaser.Timer.SECOND * 3, 10, createAnt, this);
+
+            for (var i = 0; i < py.length; i++) {
+                py[i] = this.rnd.between(32, 432);
+            }
+
+
+            this.plot();
+
+        },
+
+
+        plot: function () {
+
+
+            this.bmd.clear();
+            this.path = [];
+            var ix = 0;
+
+            var x = 1 / 900;
+
+            for (var i = 0; i <= 1; i += x) {
+                //var px = this.math.linearInterpolation(this.points.x, i);
+                //var py = this.math.linearInterpolation(this.points.y, i);
+
+
+                var px = this.math.catmullRomInterpolation(this.points.x, i);
+                var py = this.math.catmullRomInterpolation(this.points.y, i);
+
+                this.bmd.rect(px, py, 1, 1, 'rgba(255, 255, 255, 1)');
+
+                var node = {x: px, y: py, angle: 0};
+
+                if (ix > 0) {
+                    node.angle = this.math.angleBetweenPoints(this.path[ix - 1], node);
+                }
+
+                this.path.push(node);
+
+                ix++;
+
+            }
+
+
+        },
+
+        update: function () {
+
+            this.ant.x = this.path[this.pi].x;
+            this.ant.y = this.path[this.pi].y;
+            this.pi++;
+            if (this.pi >= this.path.length) {
+                this.pi = 0;
+            }
+            this.ant.rotation = this.path[this.pi].angle;
+        }
+
+    };
+
+
+    function rePlay(music) {
+        music.play()
+    }
+
+    function createAnt() {
+        var ant = game.add.sprite(0, 0, 'ant');
+        this.ant.anchor.set(0.5);
+    }
+
+    function randomNum(x) {
+        return Math.floor((Math.random() * x));
+    }
+
+    function render() {
+    }
+
+    function toggleSound() {
+        if (mute.frame == 0) {
+            game.sound.mute = true;
+            mute.frame = 1;
+        } else {
+            game.sound.mute = false;
+            mute.frame = 0;
+        }
+    }
+
+    function earthClick() {
+        mybrush = C_FIRE
+    }
+    function waterClick() {
+        mybrush = C_WATER
+    }
+    function airClick() {
+        mybrush = C_AIR
+    }
+    function fireClick() {
+        mybrush = C_FIRE
+    }
+
+    function removeLogo() {
+
+        game.input.onDown.remove(removeLogo, this);
+        splash.kill();
+        game.paused = false;
+
+    }
+
+    function createLeve(){
+
+    }
+
+    function soundSetup(mylevel) {
+        // Start the music!  Yes, we should make this optional, but hey... use your volume button.
+        // Added a 'level' parameter...
+        if (mylevel == 1) {
+            music = game.add.sound('music_level1', musicvolume)
+        }
+        else if (mylevel == 2) {
+            music = game.add.sound('music_level2', musicvolume)
+        }
+        else if (mylevel == 3) {
+            music = game.add.sound('music_level3', musicvolume)
+        }
+        else {
+            music = game.add.sound('antmusic', musicvolume)
+        }
+        music.play();
+        music.onStop.add(rePlay, this);
+//        gulp = game.add.sound('gulp');
+//        flap = game.add.sound('birdflapping', 0.5);
+//        teleport = game.add.sound('teleport');
+    }
+
+    game.state.add('Game', PhaserGame, true);
+
+
+</script>
+
+</body>
+</html>
