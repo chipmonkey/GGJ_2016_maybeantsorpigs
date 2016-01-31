@@ -10,7 +10,8 @@
 
 <div class="container">
     <h1 class="col-lg-offset-4 col-lg-6">Ants or Pigs</h1>
-    <p class="col-lg-offset-4">Professionally crafted for Global Game Jam 2016 by LilacLlama, ChipMonkey, GaryTaco, and Zomblack</p>
+    <p class="col-lg-offset-4">Professionally crafted for Global Game Jam 2016 by LilacLlama, ChipMonkey, GaryTaco, and
+        Zomblack</p>
     <hr/>
 
     <div class="col-lg-offset-1 col-lg-10" id="game"/>
@@ -24,9 +25,8 @@
 </html>
 
 <script type="text/javascript">
-    
-    var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {
-    });
+
+    var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {});
 
     var WORLD_SIZE_WIDTH = 2000;
     var WORLD_SIZE_HEIGHT = 2000;
@@ -52,24 +52,25 @@
 
         this.bmd = null;
         this.points = {
-            'x': [ 32, 128, 256, 384, 512, 608 ],
-            'y': [ 240, 240, 240, 240, 240, 240 ]
+            'x': [32, 128, 256, 384, 512, 608],
+            'y': [240, 240, 240, 240, 240, 240]
         };
-        
+
         this.ant = null;
         this.bmd = null;
         this.pi = 0;
         this.path = [];
     };
-    
-PhaserGame.prototype = {
-    
-    init: function () {
+
+    PhaserGame.prototype = {
+
+        init: function () {
             this.game.renderer.renderSession.roundPixels = true;
-            
-    },
-    
-    preload: function() {
+
+        },
+
+        preload: function () {
+
 
 
         // Sprites
@@ -80,39 +81,40 @@ PhaserGame.prototype = {
         game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
         game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
 
-        // Images
-        game.load.image('dirt', 'assets/rpgTile024.png');
-        game.load.image('splash', 'assets/SplashScreen.png');
 
-        // Audio
-        game.load.audio('antmusic', 'assets/peg.mp3');
-        game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
-        game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
-        game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
+            // Images
+            game.load.image('dirt', 'assets/rpgTile024.png');
+            game.load.image('splash', 'assets/SplashScreen.png');
 
-    },
+            // Audio
+            game.load.audio('antmusic', 'assets/peg.mp3');
+            game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
+            game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
+            game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
 
-    create: function() {
+        },
 
-        //game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
-        //game.physics.startSystem(Phaser.Physics.ARCADE);
+        create: function () {
 
-        
-        bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
-        
-        soundSetup(1);
+            //game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
+            //game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        //  The score
-        scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
-        scoreText.fixedToCamera = true;
 
-        // Volume Button
-        mute = game.add.button(866, 16, 'volume', toggleSound, this);
-        mute.anchor.setTo(0.5, 0.5);
-        mute.fixedToCamera = true;
+            bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
 
-        // Our controls.
-        cursors = game.input.keyboard.createCursorKeys();
+            soundSetup(1);
+
+            //  The score
+            scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
+            scoreText.fixedToCamera = true;
+
+            // Volume Button
+            mute = game.add.button(866, 16, 'volume', toggleSound, this);
+            mute.anchor.setTo(0.5, 0.5);
+            mute.fixedToCamera = true;
+
+            // Our controls.
+            cursors = game.input.keyboard.createCursorKeys();
 //        cursors.left.onDown.add(null, this);
         earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
         waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
@@ -121,45 +123,50 @@ PhaserGame.prototype = {
         // earthbutton.anchor.setTo(0.5, 0.5);
 
 
-        // Splash screen
-        splash = game.add.sprite(0, 0, 'splash');
-        splash.fixedToCamera = true;
-        game.input.keyboard.onDownCallback = removeLogo;
-        game.paused = true;
+            // Splash screen
+            splash = game.add.sprite(0, 0, 'splash');
+            splash.fixedToCamera = true;
+            game.input.keyboard.onDownCallback = removeLogo;
+            game.paused = true;
 
-        this.bmd = this.add.bitmapData(this.game.width, this.game.height);
-        this.bmd.addToWorld();
-        this.ant = game.add.sprite(0, 0, 'ant');
-        this.ant.anchor.set(0.5);
-        
-        var py = this.points.y;
+            this.bmd = this.add.bitmapData(this.game.width, this.game.height);
+            this.bmd.addToWorld();
+            this.ant = game.add.sprite(0, 0, 'ant');
+            this.ant.anchor.set(0.5);
 
-        for (var i = 0; i < py.length; i++)
-        {
-            py[i] = this.rnd.between(32, 432);
-        }
+            var py = this.points.y;
+
 
         this.plot();
         
         game.time.events.repeat(Phaser.Timer.SECOND*3, 10, createAnt, this);
 
-    },
+            for (var i = 0; i < py.length; i++) {
+                py[i] = this.rnd.between(32, 432);
+            }
 
-    plot: function () {
+
+            this.plot();
+
+        },
+
 
         this.bmd.clear();
         this.path = [];
         var ix = 0;
 
-        var x = 1 / 900;
+        plot: function () {
 
-        for (var i = 0; i <= 1; i += x)
-        {
-            //var px = this.math.linearInterpolation(this.points.x, i);
-            //var py = this.math.linearInterpolation(this.points.y, i);
 
-            // var px = this.math.bezierInterpolation(this.points.x, i);
-            // var py = this.math.bezierInterpolation(this.points.y, i);
+            this.bmd.clear();
+            this.path = [];
+
+            var x = 1 / 900;
+
+            for (var i = 0; i <= 1; i += x) {
+                //var px = this.math.linearInterpolation(this.points.x, i);
+                //var py = this.math.linearInterpolation(this.points.y, i);
+
 
             var px = this.math.catmullRomInterpolation(this.points.x, i);
             var py = this.math.catmullRomInterpolation(this.points.y, i);
@@ -196,6 +203,7 @@ PhaserGame.prototype = {
     
 };
     
+
     function rePlay(music) {
         music.play()
     }
@@ -238,10 +246,18 @@ PhaserGame.prototype = {
     function soundSetup(mylevel) {
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
         // Added a 'level' parameter...
-        if (mylevel == 1) {music=game.add.sound('music_level1', musicvolume)}
-        else if (mylevel == 2) {music=game.add.sound('music_level2', musicvolume)}
-        else if (mylevel == 3) {music=game.add.sound('music_level3', musicvolume)}
-        else { music = game.add.sound('antmusic', musicvolume) }
+        if (mylevel == 1) {
+            music = game.add.sound('music_level1', musicvolume)
+        }
+        else if (mylevel == 2) {
+            music = game.add.sound('music_level2', musicvolume)
+        }
+        else if (mylevel == 3) {
+            music = game.add.sound('music_level3', musicvolume)
+        }
+        else {
+            music = game.add.sound('antmusic', musicvolume)
+        }
         music.play();
         music.onStop.add(rePlay, this);
 //        gulp = game.add.sound('gulp');
