@@ -167,9 +167,14 @@
 
             // Spider
             var obstaclePt =  this.rnd.between(0, 9)
-            var spider = game.add.sprite(this.points.x[obstaclePt] - 16 , this.points.y[obstaclePt] - 16, 'spider');
+            var rScale = game.rnd.realInRange(2, 4);
+            var spider = game.add.sprite(this.points.x[obstaclePt] - 16 * rScale , this.points.y[obstaclePt] - 16 * rScale, 'spider');
+            spider.scale.setTo(rScale, rScale);
             var chomp = spider.animations.add('chomp');
             spider.animations.play('chomp', 7, true);
+//            spider.anchor.setTo(0.5, 0.5);
+//            spider.angle += 90;
+
 
             // Splash screen
             splash = game.add.sprite(0, 0, 'splash');
