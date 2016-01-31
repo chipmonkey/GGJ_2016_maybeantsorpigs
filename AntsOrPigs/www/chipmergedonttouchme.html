@@ -124,10 +124,6 @@
             //game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
             //game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        // Music Button
-        musictoggle = game.add.button(866, 70, 'music', toggleMusic, this);
-        musictoggle.anchor.setTo(0.5, 0.5);
-        musictoggle.fixedToCamera = true;
 
             bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
 
@@ -159,11 +155,7 @@
         firebutton.onInputOut.add(outbutton, this);
 
 
-            // Splash screen
-            splash = game.add.sprite(0, 0, 'splash');
-            splash.fixedToCamera = true;
-            game.input.keyboard.onDownCallback = removeLogo;
-            game.paused = true;
+
 
             this.bmd = this.add.bitmapData(this.game.width, this.game.height);
             this.bmd.addToWorld();
@@ -188,6 +180,11 @@
             game.time.events.add(Phaser.Timer.SECOND*24, createAnt8, this);
             game.time.events.add(Phaser.Timer.SECOND*27, createAnt9, this);
             
+        // Splash screen
+            splash = game.add.sprite(0, 0, 'splash');
+            splash.fixedToCamera = true;
+            game.input.keyboard.onDownCallback = removeLogo;
+            game.paused = true;
             
         },
         
@@ -348,6 +345,16 @@
             this.newAnt9.destroy();
         }
         }
+        
+        
+            if (game.input.activePointer.leftButton.isDown && brushdown) {
+            newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+            if (mybrush == C_EARTH) { newsplat.tint = 0x9f4715 }
+            if (mybrush == C_WATER) { newsplat.tint = 0x0000FF }
+            if (mybrush == C_AIR) { newsplat.tint = 0xFFFFFF }
+            if (mybrush == C_FIRE) { newsplat.tint = 0xFF0000 }
+        }
+        
     }
     
 };
