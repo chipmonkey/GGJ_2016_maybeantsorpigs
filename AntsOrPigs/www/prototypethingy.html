@@ -26,10 +26,6 @@
 <script type="text/javascript">
     
     var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {
-        preload: preload,
-        create: create,
-        update: update,
-        render: render
     });
 
     var WORLD_SIZE_WIDTH = 2000;
@@ -61,101 +57,6 @@
         this.path = [];
     };
     
-    function preload() {
-
-
-        // Sprites
-        game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
-        game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
-
-
-//        for (i = 0; i < planetSprites.length; i++) {
-//            game.load.spritesheet(planetSprites[i].sheet, planetSprites[i].assets, planetSprites[i].size, planetSprites[i].size);
-//        }
-//
-//        // Images
-        game.load.image('dirt', 'assets/rpgTile024.png');
-//        game.load.image('stars', 'assets/starsglow1.gif');
-        game.load.image('splash', 'assets/SplashScreen.png');
-
-        // Audio
-//        game.load.audio('gulp', 'assets/gulp.m4a');
-//        game.load.audio('birdflapping', 'assets/Flap.m4a');
-//        game.load.audio('teleport', 'assets/teleport.mp3');
-        game.load.audio('antmusic', 'assets/peg.mp3');
-        game.load.audio('music_level1', 'assets/Music/Ants Level 1.mp3')
-        game.load.audio('music_level2', 'assets/Music/Ants Level 2.mp3')
-        game.load.audio('music_level3', 'assets/Music/Ants Level 3.mp3')
-
-    }
-
-    function create() {
-
-        game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-
-        
-        bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
-        
-        soundSetup(1);
-
-        //  The score
-        scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
-        scoreText.fixedToCamera = true;
-
-        // Volume Button
-        mute = game.add.button(866, 16, 'volume', toggleSound, this);
-        mute.anchor.setTo(0.5, 0.5);
-        mute.fixedToCamera = true;
-
-        // Our controls.
-        cursors = game.input.keyboard.createCursorKeys();
-//        cursors.left.onDown.add(null, this);
-
-
-        // Splash screen
-        splash = game.add.sprite(0, 0, 'splash');
-        splash.fixedToCamera = true;
-        game.input.keyboard.onDownCallback = removeLogo;
-        game.paused = true;
-
-        ant = game.add.sprite(450, 250, 'ant');
-                
-    }
-
-    function update() {
-
-        //  Checks to see if the chicken overlaps with any of the stars, if he does call the collectStar function
-//        game.physics.arcade.overlap(chicken, stars, collectStar, null, this);
-//    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
-//        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
-
-
-//        if (cursors.left.isDown && cursors.right.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 40, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity -= (chicken.body.angularVelocity == 0) ? 0 : 5 * chicken.body.angularVelocity / Math.abs(chicken.body.angularVelocity);
-//            chicken.animations.play('both');
-//        }
-//        else if (cursors.left.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 20, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity += -20;
-//            chicken.animations.play('left');
-//        }
-//        else if (cursors.right.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 20, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity += 20;
-//            chicken.animations.play('right');
-//        }
-//        else {
-//        }
-
-
-    }
-
-
 PhaserGame.prototype = {
     
     init: function () {
