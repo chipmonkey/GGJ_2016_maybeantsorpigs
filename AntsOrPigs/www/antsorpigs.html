@@ -158,18 +158,11 @@
 
     function toggleSound() {
         if (mute.frame == 0) {
+            game.sound.mute = true;
             mute.frame = 1;
-            music.volume = 0;
-            gulp.volume = 0;
-            flap.volume = 0;
-            teleport.volume = 0;
-
         } else {
+            game.sound.mute = false;
             mute.frame = 0;
-            music.volume = 0.75;
-            gulp.volume = 1;
-            flap.volume = 0.5;
-            teleport.volume = 1;
         }
     }
 
