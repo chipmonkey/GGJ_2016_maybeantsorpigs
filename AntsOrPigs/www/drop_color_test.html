@@ -41,7 +41,13 @@
     const C_WATER = 3;
     const C_FIRE = 4;
     
+    var earthcounter = 5;
+    var aircounter = 5;
+    var watercounter = 5;
+    var firecounter = 5;
+    
     var mybrush = C_EARTH;
+    var brushdown = false;
     
 
 
@@ -94,6 +100,8 @@
 
         game.world.setBounds(0, 0, WORLD_SIZE_WIDTH, WORLD_SIZE_HEIGHT);
         game.physics.startSystem(Phaser.Physics.ARCADE);
+        
+        game.input.mouse.capture = true;
 
         bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
         
@@ -120,6 +128,14 @@
         waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
         airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
         firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
+        earthbutton.onInputOver.add(over, this);
+        waterbutton.onInputOver.add(over, this);
+        airbutton.onInputOver.add(over, this);
+        firebutton.onInputOver.add(over, this);
+        earthbutton.onInputOut.add(outbutton, this);
+        waterbutton.onInputOut.add(outbutton, this);
+        airbutton.onInputOut.add(outbutton, this);
+        firebutton.onInputOut.add(outbutton, this);
         // earthbutton.anchor.setTo(0.5, 0.5);
         // earthbutton.fixedToCamera = true;
 
@@ -128,6 +144,7 @@
         splash = game.add.sprite(0, 0, 'splash');
         splash.fixedToCamera = true;
         game.input.keyboard.onDownCallback = removeLogo;
+        game.input.activePointer.onDownCallback = removeLogo;
         game.paused = true;
 
         ant = game.add.sprite(450, 250, 'ant');
@@ -142,7 +159,8 @@
         //    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
         //        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
         
-        if (game.input.onTap)    {
+        // if (game.input.onTap)    {}
+        if (game.input.activePointer.leftButton.isDown && brushdown) {
             newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
             if (mybrush == C_EARTH) { newsplat.tint = 0x9f4715 }
             if (mybrush == C_WATER) { newsplat.tint = 0x0000FF }
@@ -153,10 +171,19 @@
 
 
     function rePlay(music) {
-        music.play()
+        // music.play()
+        toggleMusic();
     }
 
 
+    function over() {
+        brushdown = false;
+    }
+    
+    function outbutton() {
+        brushdown = true;
+    }
+    
     function randomNum(x) {
         return Math.floor((Math.random() * x));
     }
@@ -175,10 +202,10 @@
     }
     
     function toggleMusic() {
-        music.destroy();
+        // music.destroy();
         musiclevel = (musiclevel + 1)
         if (musiclevel == 4) {musiclevel = 1};
-        soundSetup(musiclevel)
+        soundSetup(musiclevel);
     }
 
 
