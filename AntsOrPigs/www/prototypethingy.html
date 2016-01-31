@@ -110,6 +110,7 @@
             // Images
             game.load.image('dirt', 'assets/rpgTile024.png');
             game.load.image('splash', 'assets/SplashScreen.png');
+            game.load.image('pool', 'assets/pool.png');
 
             // Audio
             game.load.audio('antmusic', 'assets/peg.mp3');
@@ -155,7 +156,15 @@
         	firebutton.onInputOut.add(outbutton, this);
 
 
+            // Pool
 
+            var minPt = 1;
+            var maxPt = 8;
+            var poolPt =  this.rnd.between(minPt, maxPt);
+
+            var pool = game.add.sprite(this.points.x[poolPt] - 96/2 , this.points.y[poolPt] - 96/2, 'pool');
+
+            // Ants Begin
             this.bmd = this.add.bitmapData(this.game.width, this.game.height);
             this.bmd.addToWorld();
             this.ant = game.add.sprite(0, 0, 'ant');
@@ -169,25 +178,21 @@
 
             this.plot();
 
-            game.time.events.add(Phaser.Timer.SECOND * 3, createAnt1, this);
-            game.time.events.add(Phaser.Timer.SECOND * 6, createAnt2, this);
-            game.time.events.add(Phaser.Timer.SECOND * 9, createAnt3, this);
-            game.time.events.add(Phaser.Timer.SECOND * 12, createAnt4, this);
-            game.time.events.add(Phaser.Timer.SECOND * 15, createAnt5, this);
-            game.time.events.add(Phaser.Timer.SECOND * 18, createAnt6, this);
-            game.time.events.add(Phaser.Timer.SECOND * 21, createAnt7, this);
-            game.time.events.add(Phaser.Timer.SECOND * 24, createAnt8, this);
-            game.time.events.add(Phaser.Timer.SECOND * 27, createAnt9, this);
 
             // Spider
-            var obstaclePt =  this.rnd.between(0, 9)
+            var spdrPt =  this.rnd.between(minPt, maxPt)
+            while(poolPt == spdrPt){
+                spdrPt =  this.rnd.between(minPt, maxPt);
+            }
             var rScale = game.rnd.realInRange(2, 4);
-            var spider = game.add.sprite(this.points.x[obstaclePt] - 16 * rScale , this.points.y[obstaclePt] - 16 * rScale, 'spider');
+            var spider = game.add.sprite(this.points.x[spdrPt] - 16 * rScale , this.points.y[spdrPt] - 16 * rScale, 'spider');
             spider.scale.setTo(rScale, rScale);
             var chomp = spider.animations.add('chomp');
             spider.animations.play('chomp', 7, true);
 //            spider.anchor.setTo(0.5, 0.5);
 //            spider.angle += 90;
+
+
 
 
             // Splash screen
