@@ -19,12 +19,13 @@
 </div>
 <script type="text/javascript" src="js/phaser.min.js"></script>
 <script src="js/jquery-2.1.1.min.js"></script>
+<script src="js/easystar-0.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
 
 <script type="text/javascript">
-
+    
     var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {
         preload: preload,
         create: create,
@@ -45,7 +46,8 @@
     var starsSwallowed = 0;
     var getwell;
     var splash;
-
+    var tween;
+    
     function preload() {
 
 
@@ -77,7 +79,7 @@
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
-
+        
         soundSetup();
 
         //  The score
@@ -100,6 +102,10 @@
         game.input.keyboard.onDownCallback = removeLogo;
         game.paused = true;
 
+        ant = game.add.sprite(450, 250, 'ant');
+        
+        tween = game.add.tween(ant).to({ x: [game.width - 32, game.width - 32, 0, 0], y: [0, game.height - 32, game.height - 32, 0]}, 5000, "Sine.easeInOut", true, 0, false);
+        tween.interpolation(Phaser.Math.catmullRomInterpolation);
     }
     function update() {
 
