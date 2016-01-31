@@ -19,7 +19,6 @@
 </div>
 <script type="text/javascript" src="js/phaser.min.js"></script>
 <script src="js/jquery-2.1.1.min.js"></script>
-<script src="js/easystar-0.2.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
@@ -33,9 +32,16 @@
         render: render
     });
 
-    var WORLD_SIZE_WIDTH = 2000;
-    var WORLD_SIZE_HEIGHT = 2000;
+    var WORLD_SIZE_WIDTH = 900;
+    var WORLD_SIZE_HEIGHT = 500;
     var musicvolume = 0.75;
+    var musiclevel = 1;
+    
+    const C_EARTH = 1;
+    const C_AIR = 2;
+    const C_WATER = 3;
+    const C_FIRE = 4;
+    
 
 
     var worldSprites = [
@@ -55,6 +61,10 @@
         // Sprites
         game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
         game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
+        game.load.spritesheet('earth_button', 'assets/earth_buttons.png', 81, 81);
+        game.load.spritesheet('water_button', 'assets/water_buttons.png', 81, 81);
+        game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
+        game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
 
 
 //        for (i = 0; i < planetSprites.length; i++) {
@@ -65,6 +75,7 @@
         game.load.image('dirt', 'assets/rpgTile024.png');
 //        game.load.image('stars', 'assets/starsglow1.gif');
         game.load.image('splash', 'assets/SplashScreen.png');
+        game.load.image('music', 'assets/musicnote.png');
 
         // Audio
 //        game.load.audio('gulp', 'assets/gulp.m4a');
@@ -84,7 +95,7 @@
 
         bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
         
-        soundSetup(1);
+        soundSetup(musiclevel);
 
         //  The score
         scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
@@ -94,10 +105,21 @@
         mute = game.add.button(866, 16, 'volume', toggleSound, this);
         mute.anchor.setTo(0.5, 0.5);
         mute.fixedToCamera = true;
+        
+        // Music Button
+        musictoggle = game.add.button(866, 70, 'music', toggleMusic, this);
+        musictoggle.anchor.setTo(0.5, 0.5);
+        musictoggle.fixedToCamera = true;
 
         // Our controls.
         cursors = game.input.keyboard.createCursorKeys();
 //        cursors.left.onDown.add(null, this);
+        earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
+        waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
+        airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
+        firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
+        // earthbutton.anchor.setTo(0.5, 0.5);
+        // earthbutton.fixedToCamera = true;
 
 
         // Splash screen
@@ -114,31 +136,11 @@
     function update() {
 
         //  Checks to see if the chicken overlaps with any of the stars, if he does call the collectStar function
-//        game.physics.arcade.overlap(chicken, stars, collectStar, null, this);
-//    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
-//        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
+        //        game.physics.arcade.overlap(chicken, stars, collectStar, null, this);
+        //    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
+        //        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
+        
 
-
-//        if (cursors.left.isDown && cursors.right.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 40, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity -= (chicken.body.angularVelocity == 0) ? 0 : 5 * chicken.body.angularVelocity / Math.abs(chicken.body.angularVelocity);
-//            chicken.animations.play('both');
-//        }
-//        else if (cursors.left.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 20, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity += -20;
-//            chicken.animations.play('left');
-//        }
-//        else if (cursors.right.isDown) {
-//            game.physics.arcade.velocityFromRotation(chicken.rotation - 1.5707963, chicken.body.speed + 20, chicken.body.velocity);
-//            game.physics.arcade.accelerationFromRotation(chicken.rotation - 1.5707963, 100, chicken.body.acceleration); // (Math.Pi/2)
-//            chicken.body.angularVelocity += 20;
-//            chicken.animations.play('right');
-//        }
-//        else {
-//        }
 
 
     }
@@ -165,6 +167,12 @@
             mute.frame = 0;
         }
     }
+    
+    function toggleMusic() {
+        musiclevel = (musiclevel + 1)
+        if (musiclevel == 4) {musiclevel = 1}
+        soundSetup(musiclevel)
+    }
 
 
     function removeLogo() {
@@ -174,6 +182,11 @@
         game.paused = false;
 
     }
+    
+    function earthClick() {  mybrush = C_FIRE  }
+    function waterClick() {  mybrush = C_WATER  }
+    function airClick()   {  mybrush = C_AIR  }
+    function fireClick()  {  mybrush = C_FIRE  }
 
     function soundSetup(mylevel) {
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
