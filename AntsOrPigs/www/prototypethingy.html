@@ -59,7 +59,9 @@
         this.ant = null;
         this.bmd = null;
         this.pi = 0;
+        this.secondMove = 0;
         this.path = [];
+        this.newAnt = null;
     };
 
     PhaserGame.prototype = {
@@ -136,18 +138,15 @@
 
             var py = this.points.y;
 
-
-        this.plot();
-        
-        game.time.events.repeat(Phaser.Timer.SECOND*3, 10, createAnt, this);
-
             for (var i = 0; i < py.length; i++) {
                 py[i] = this.rnd.between(32, 432);
             }
-
-
+            
             this.plot();
-
+            
+            game.time.events.repeat(Phaser.Timer.SECOND*3, 10, createAnt, this);
+            
+            
         },
         
 
@@ -191,11 +190,23 @@
         this.ant.x = this.path[this.pi].x;
         this.ant.y = this.path[this.pi].y;
         this.pi++;
+        this.ant.rotation = this.path[this.pi].angle;
         if (this.pi >= this.path.length)
         {
-            this.pi = 0;
+            this.ant.remove;
         }
-        this.ant.rotation = this.path[this.pi].angle;
+        
+        if (this.newAnt !== null){
+        this.newAnt.x = this.path[this.secondMove].x;
+        this.newAnt.y = this.path[this.secondMove].y;
+        this.secondMove++;
+        this.newAnt.rotation = this.path[this.secondMove].angle;
+        if (this.secondMove >= this.path.length)
+        {
+            this.newAnt.remove;
+        }
+
+        }
     }
     
 };
@@ -206,8 +217,19 @@
     }
 
     function createAnt() {
-        var ant = game.add.sprite( 0, 0, 'ant');
-        this.ant.anchor.set(0.5);
+        this.newAnt = game.add.sprite( 0, 0, 'ant');
+        this.newAnt.anchor.set(0.5);
+                
+    }
+    function antMoves(newAnt) {
+        newAnt.x = this.path[this.pi].x;
+        newAnt.y = this.path[this.pi].y;
+        this.pi++;
+        if (this.pi >= this.path.length)
+        {
+            this.pi = 0;
+        }
+        newAnt.rotation = this.path[this.pi].angle;
     }
 
     function randomNum(x) {
