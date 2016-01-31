@@ -31,6 +31,11 @@
     var WORLD_SIZE_WIDTH = 2000;
     var WORLD_SIZE_HEIGHT = 2000;
     var musicvolume = 0.75;
+    
+    const C_EARTH = 1;
+    const C_AIR = 2;
+    const C_WATER = 3;
+    const C_FIRE = 4;
 
 
     var worldSprites = [
@@ -70,6 +75,10 @@ PhaserGame.prototype = {
         // Sprites
         game.load.spritesheet('volume', 'assets/volume.png', 36, 36);
         game.load.spritesheet('ant', 'assets/ant.png', 32, 32);
+        game.load.spritesheet('earth_button', 'assets/earth_buttons.png', 81, 81);
+        game.load.spritesheet('water_button', 'assets/water_buttons.png', 81, 81);
+        game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
+        game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
 
         // Images
         game.load.image('dirt', 'assets/rpgTile024.png');
@@ -105,6 +114,11 @@ PhaserGame.prototype = {
         // Our controls.
         cursors = game.input.keyboard.createCursorKeys();
 //        cursors.left.onDown.add(null, this);
+        earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
+        waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
+        airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
+        firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
+        // earthbutton.anchor.setTo(0.5, 0.5);
 
 
         // Splash screen
@@ -126,6 +140,8 @@ PhaserGame.prototype = {
         }
 
         this.plot();
+        
+        game.time.events.repeat(Phaser.Timer.SECOND*3, 10, createAnt, this);
 
     },
 
@@ -133,6 +149,7 @@ PhaserGame.prototype = {
 
         this.bmd.clear();
         this.path = [];
+        var ix = 0;
 
         var x = 1 / 900;
 
@@ -147,10 +164,22 @@ PhaserGame.prototype = {
             var px = this.math.catmullRomInterpolation(this.points.x, i);
             var py = this.math.catmullRomInterpolation(this.points.y, i);
             
-            this.path.push( { x: px, y: py });
             this.bmd.rect(px, py, 1, 1, 'rgba(255, 255, 255, 1)');
 
+            var node = { x: px, y: py, angle: 0 };
+
+        if (ix > 0)
+        {
+            node.angle = this.math.angleBetweenPoints(this.path[ix - 1], node);
         }
+
+        this.path.push(node);
+
+        ix++;
+            
+        }
+        
+        
     },
     
     update: function() {
@@ -162,6 +191,7 @@ PhaserGame.prototype = {
         {
             this.pi = 0;
         }
+        this.ant.rotation = this.path[this.pi].angle;
     }
     
 };
@@ -170,6 +200,10 @@ PhaserGame.prototype = {
         music.play()
     }
 
+    function createAnt() {
+        var ant = game.add.sprite( 0, 0, 'ant');
+        this.ant.anchor.set(0.5);
+    }
 
     function randomNum(x) {
         return Math.floor((Math.random() * x));
@@ -188,6 +222,10 @@ PhaserGame.prototype = {
         }
     }
 
+    function earthClick() {  mybrush = C_FIRE  }
+    function waterClick() {  mybrush = C_WATER  }
+    function airClick()   {  mybrush = C_AIR  }
+    function fireClick()  {  mybrush = C_FIRE  }
 
     function removeLogo() {
 
