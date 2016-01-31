@@ -35,6 +35,7 @@
 
     var WORLD_SIZE_WIDTH = 2000;
     var WORLD_SIZE_HEIGHT = 2000;
+    var musicvolume = 0.75;
 
 
     var worldSprites = [
@@ -70,6 +71,9 @@
 //        game.load.audio('birdflapping', 'assets/Flap.m4a');
 //        game.load.audio('teleport', 'assets/teleport.mp3');
         game.load.audio('antmusic', 'assets/peg.mp3');
+        game.load.audio('music_level1', 'assets/Ants Level 1.mp3')
+        game.load.audio('music_level2', 'assets/Ants Level 2.mp3')
+        game.load.audio('music_level3', 'assets/Ants Level 3.mp3')
 
     }
 
@@ -80,7 +84,7 @@
 
         bgtile = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'dirt');
         
-        soundSetup();
+        soundSetup(1);
 
         //  The score
         scoreText = game.add.text(16, 16, 'Sugar Cubes Gulped: 0', {fontSize: '32px', fill: '#FFF'});
@@ -178,9 +182,13 @@
 
     }
 
-    function soundSetup() {
+    function soundSetup(mylevel) {
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
-        music = game.add.sound('antmusic', 0.75);
+        // Added a 'level' parameter...
+        if (mylevel == 1) {music=game.add.sound('music_level1', musicvolume)}
+        else if (mylevel == 2) {music=game.add.sound('music_level1', musicvolume)}
+        else if (mylevel == 3) {music=game.add.sound('music_level1', musicvolume)}
+        else { music = game.add.sound('antmusic', musicvolume) }
         music.play();
         music.onStop.add(rePlay, this);
 //        gulp = game.add.sound('gulp');
