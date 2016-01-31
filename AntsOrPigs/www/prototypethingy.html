@@ -16,7 +16,6 @@
 
     <div class="col-lg-offset-1 col-lg-10" id="game"/>
 
-
 </div>
 <script type="text/javascript" src="js/phaser.min.js"></script>
 <script src="js/jquery-2.1.1.min.js"></script>
@@ -28,14 +27,21 @@
 
     var game = new Phaser.Game(900, 500, Phaser.AUTO, 'game', {});
 
-    var WORLD_SIZE_WIDTH = 2000;
-    var WORLD_SIZE_HEIGHT = 2000;
     var musicvolume = 0.75;
 
     const C_EARTH = 1;
     const C_AIR = 2;
     const C_WATER = 3;
     const C_FIRE = 4;
+    
+    var earthcounter = 5;
+    var aircounter = 5;
+    var watercounter = 5;
+    var firecounter = 5;
+    
+    var mybrush = C_EARTH;
+    var brushdown = false;
+    
 
 
     var worldSprites = [
@@ -99,6 +105,7 @@
             game.load.spritesheet('air_button', 'assets/air_buttons.png', 81, 81);
             game.load.spritesheet('fire_button', 'assets/fire_buttons.png', 81, 81);
             game.load.spritesheet('spider', 'assets/spider_32x32.png', 32, 32);
+			game.load.spritesheet('splat', 'assets/splat40x25.png', 40, 25);
 
             // Images
             game.load.image('dirt', 'assets/rpgTile024.png');
@@ -134,11 +141,18 @@
             // Our controls.
             cursors = game.input.keyboard.createCursorKeys();
 //        cursors.left.onDown.add(null, this);
-            earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
+		    earthbutton = game.add.button(450, 10, 'earth_button', earthClick, this, 1, 0, 1);
             waterbutton = game.add.button(550, 10, 'water_button', waterClick, this, 1, 0, 1);
             airbutton = game.add.button(650, 10, 'air_button', airClick, this, 1, 0, 1);
             firebutton = game.add.button(750, 10, 'fire_button', fireClick, this, 1, 0, 1);
-            // earthbutton.anchor.setTo(0.5, 0.5);
+        	earthbutton.onInputOver.add(over, this);
+        	waterbutton.onInputOver.add(over, this);
+        	airbutton.onInputOver.add(over, this);
+        	firebutton.onInputOver.add(over, this);
+        	earthbutton.onInputOut.add(outbutton, this);
+        	waterbutton.onInputOut.add(outbutton, this);
+        	airbutton.onInputOut.add(outbutton, this);
+        	firebutton.onInputOut.add(outbutton, this);
 
 
 
@@ -330,14 +344,29 @@
                     this.newAnt9.destroy();
                 }
             }
+            if (game.input.activePointer.leftButton.isDown && brushdown) {
+            newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+            if (mybrush == C_EARTH) { newsplat.tint = 0x9f4715 }
+            if (mybrush == C_WATER) { newsplat.tint = 0x0000FF }
+            if (mybrush == C_AIR) { newsplat.tint = 0xFFFFFF }
+            if (mybrush == C_FIRE) { newsplat.tint = 0xFF0000 }
+        	}
         }
 
     };
 
 
     function rePlay(music) {
-        music.play()
+        toggleMusic();
     }
+
+    function over() {
+        brushdown = false;
+    }
+
+    function outbutton() {
+        brushdown = true;
+	}
 
     function createAnt1() {
         this.newAnt1 = game.add.sprite(0, 0, 'ant');
@@ -401,6 +430,11 @@
             mute.frame = 0;
         }
     }
+    function toggleMusic() {
+        musiclevel = (musiclevel + 1)
+        if (musiclevel == 4) {musiclevel = 1};
+        soundSetup(musiclevel);
+	}
 
     function earthClick() {
         mybrush = C_FIRE
