@@ -139,6 +139,7 @@
         //    game.physics.arcade.overlap(chicken, planetGroup, planetThing, null, this);
         //        game.physics.arcade.overlap(chicken, amoebas, smackDown, null, this);
         
+        
 
 
 
@@ -168,8 +169,9 @@
     }
     
     function toggleMusic() {
+        music.destroy();
         musiclevel = (musiclevel + 1)
-        if (musiclevel == 4) {musiclevel = 1}
+        if (musiclevel == 4) {musiclevel = 1};
         soundSetup(musiclevel)
     }
 
@@ -190,10 +192,10 @@
     function soundSetup(mylevel) {
         // Start the music!  Yes, we should make this optional, but hey... use your volume button.
         // Added a 'level' parameter...
-        if (mylevel == 1) {music=game.add.sound('music_level1', musicvolume)}
-        else if (mylevel == 2) {music=game.add.sound('music_level2', musicvolume)}
-        else if (mylevel == 3) {music=game.add.sound('music_level3', musicvolume)}
-        else { music = game.add.sound('antmusic', musicvolume) }
+        if (mylevel == 1) {music=game.add.audio('music_level1', musicvolume)}
+        else if (mylevel == 2) {music=game.add.audio('music_level2', musicvolume)}
+        else if (mylevel == 3) {music=game.add.audio('music_level3', musicvolume)}
+        else { music = game.add.audio('antmusic', musicvolume) }
         music.play();
         music.onStop.add(rePlay, this);
 //        gulp = game.add.sound('gulp');

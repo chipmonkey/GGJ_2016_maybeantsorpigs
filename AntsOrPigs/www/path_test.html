@@ -111,6 +111,8 @@
         tween = game.add.tween(ant).to({ x: [game.width - 32, game.width - 32, 0, 0], y: [0, game.height - 32, game.height - 32, 0]}, 5000, "Sine.easeInOut", true, 0, false);
         tween.interpolation(Phaser.Math.catmullRomInterpolation);
     }
+    
+    
     function update() {
 
         //  Checks to see if the chicken overlaps with any of the stars, if he does call the collectStar function
@@ -158,18 +160,11 @@
 
     function toggleSound() {
         if (mute.frame == 0) {
+            game.sound.mute = true;
             mute.frame = 1;
-            music.volume = 0;
-            gulp.volume = 0;
-            flap.volume = 0;
-            teleport.volume = 0;
-
         } else {
+            game.sound.mute = false;
             mute.frame = 0;
-            music.volume = 0.75;
-            gulp.volume = 1;
-            flap.volume = 0.5;
-            teleport.volume = 1;
         }
     }
 
