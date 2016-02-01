@@ -34,10 +34,12 @@
     const C_WATER = 3;
     const C_FIRE = 4;
     
-    var earthcounter = 5;
-    var aircounter = 5;
-    var watercounter = 5;
-    var firecounter = 5;
+    var earthcounter = 25;
+    var aircounter = 25;
+    var watercounter = 25;
+    var firecounter = 25;
+    var fireRate = 200;
+    var nextFire = 0;
     
     var mybrush = C_EARTH;
     var brushdown = false;
@@ -153,7 +155,12 @@
         	waterbutton.onInputOut.add(outbutton, this);
         	airbutton.onInputOut.add(outbutton, this);
         	firebutton.onInputOut.add(outbutton, this);
-
+            
+            // Clicks Remaining
+            earthtext = game.add.text(460,20, earthcounter, {fontSize: '32px', fill: '#FFF'});
+            watertext = game.add.text(560,20, watercounter, {fontSize: '32px', fill: '#FFF'});
+            airtext = game.add.text(660,20, aircounter, {fontSize: '32px', fill: '#FFF'});
+            firetext = game.add.text(760,20, firecounter, {fontSize: '32px', fill: '#FFF'});
 
 
             this.bmd = this.add.bitmapData(this.game.width, this.game.height);
@@ -344,12 +351,32 @@
                     this.newAnt9.destroy();
                 }
             }
-            if (game.input.activePointer.leftButton.isDown && brushdown) {
-            newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
-            if (mybrush == C_EARTH) { newsplat.tint = 0x9f4715 }
-            if (mybrush == C_WATER) { newsplat.tint = 0x0000FF }
-            if (mybrush == C_AIR) { newsplat.tint = 0xFFFFFF }
-            if (mybrush == C_FIRE) { newsplat.tint = 0xFF0000 }
+        if (game.input.activePointer.leftButton.isDown && brushdown && game.time.now > nextFire) {
+                    if (mybrush == C_EARTH && earthcounter > 0) {
+                        newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+                        newsplat.tint = 0x9f4715;
+                        earthcounter--;
+                        earthtext.setText(earthcounter)
+                    }
+                    if (mybrush == C_WATER && watercounter > 0) {
+                        newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+                        newsplat.tint = 0x0000FF;
+                        watercounter--;
+                        watertext.setText(watercounter);
+                    }
+                    if (mybrush == C_AIR && aircounter > 0) {
+                        newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+                        newsplat.tint = 0xFFFFFF;
+                        aircounter--;
+                        airtext.setText(aircounter);
+                    }
+                    if (mybrush == C_FIRE && firecounter > 0) {
+                        newsplat = game.add.sprite(game.input.x, game.input.y, 'splat');
+                        newsplat.tint = 0xFF0000;
+                        firecounter--;
+                        firetext.setText(firecounter);
+                    }
+                nextFire = game.time.now+fireRate;
         	}
         }
 
@@ -437,7 +464,7 @@
 	}
 
     function earthClick() {
-        mybrush = C_FIRE
+        mybrush = C_EARTH;
     }
     function waterClick() {
         mybrush = C_WATER
